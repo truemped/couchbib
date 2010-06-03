@@ -1,0 +1,6 @@
+[submodule "vendor/sammy"]
+	path = vendor/sammy
+	url = git://github.com/truemped/sammy-vendor.git
+[submodule "vendor/jquery"]
+	path = vendor/jquery
+	url = git://github.com/truemped/jquery-vendor.git
