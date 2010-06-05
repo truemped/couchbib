@@ -1,0 +1,22 @@
+{
+    "citekey" : "Zitierschlüssel",
+    "author" : "Autor",
+    "title" : "Titel",
+    "publisher" : "Verlag",
+    "month" : "Monat",
+    "school" : "Universität",
+    "year" : "Jahr",
+    "editor" : "Herausgeber",
+    "volume" : "Band",
+    "number" : "Ausgabe",
+    "series" : "Serie",
+    "address" : "Adresse",
+    "edition" : "Edition",
+    "pages" : "Seiten",
+    "chapter" : "Kapitel",
+    "booktitle" : "Buchtitel",
+    "journal" : "Zeitschrift",
+    "organization" : "Organisation",
+    "note" : "Notizen",
+    "tags" : "Schlagwörter"
+}
