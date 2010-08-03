@@ -1,7 +1,7 @@
 {
     "env": {
         "default": {
-            "db": "http://localhost:5984/couchapptemplate"
+            "db": "http://localhost:5984/couchbib"
         }
     }
 }
