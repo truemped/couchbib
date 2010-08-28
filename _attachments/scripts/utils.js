@@ -1,13 +1,13 @@
 
 // function called when an attachment should be deleted
-function deleteAttachment( url ) {
+function deleteAttachment( name, url ) {
     if( confirm("Wirklich löschen?") ) {
         $.ajax( {
             type : "DELETE",
             url : url,
             success: function() {
                 alert('Wurde gelöscht');
-                window.location.reload();
+                window.location.hash = "/doc/"+name;
             }
         });
     }
