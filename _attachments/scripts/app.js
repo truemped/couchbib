@@ -1,11 +1,9 @@
 ;(function($) {
 
-
-    var app = $.sammy( function() {
-        this.use( Sammy.Title );
-        this.use( Sammy.Mustache );
-
-        this.setTitle( 'couchbib' );
+    /*
+     * Some couchdb helper functions for sammy.
+     */
+    var CouchDbHelpers = function( app ) {
 
         this.helpers( {
             withCouchApp: function(callback) {
@@ -30,6 +28,15 @@
                 });
             },
         });
+
+    };
+
+    var app = $.sammy( function() {
+        this.use( Sammy.Title );
+        this.use( Sammy.Mustache );
+        this.use( CouchDbHelpers );
+
+        this.setTitle( 'couchbib' );
 
         this.get('#/', function(context) {
             context.redirect( '#/newest' );
@@ -114,12 +121,12 @@
                     }
                     doc.fields.push( { id : "tags", name : app.ddoc.fieldnames[ "tags" ] } );
 
-                    $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
-                    $("#itemDetails").tabs();
-
                     var allFields = ["citekey"];
                     allFields = allFields.concat( type.fields );
                     allFields.push( "tags" );
+
+                    $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
+                    $("#itemDetails").tabs();
 
                     var postForm = app.docForm( "form#item_details", {
                         fields : allFields,
@@ -154,7 +161,7 @@
                             }
                         },
                         success : function( resp, localDoc ) {
-                            self.trigger("show-item-details", { docid : localDoc._id } );
+                            self.redirect( "#/doc/"+localDoc._id );
                         }
                     });
                 } else {
@@ -176,17 +183,19 @@
                     success : function(doc) {
 
                         var type = app.ddoc.types[ doc.type ];
-                        var allfields = type.fields;
-                        allfields.splice( 0,0,"citekey" );
-                        allfields.push("tags");
+                        doc.fields = [ { id : "citekey", name : app.ddoc.fieldnames[ "citekey" ] } ];
 
-                        doc.regular = true;
-                        doc.fields = [];
-                        for( var idx in allfields ) {
+                        var allFields = ["citekey"];
+                        allFields = allFields.concat( type.fields );
+                        allFields.push( "tags" );
+
+                        for( var idx in type.fields ) {
                             if( type.fields[idx].indexOf( "note" ) == -1 ) {
-                                doc.fields[ idx ] = { id : type.fields[idx], name : app.ddoc.fieldnames[ type.fields[idx] ] };
+                                doc.fields.push( { id : type.fields[idx], name : app.ddoc.fieldnames[ type.fields[idx] ] } );
                             }
                         }
+                        doc.fields.push( { id : "tags", name : app.ddoc.fieldnames[ "tags" ] } );
+                        doc.regular = true;
 
                         // add all the attachments
                         doc.attachments = "";
@@ -204,13 +213,14 @@
                         $("#deleteDoc").bind( 'click', function() {
                             if( confirm( "Eintrag wirklich löschen?" ) ) {
                                 app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
+                                self.redirect( "#/newest" );
                             }
                         });
                         $("button, input:submit, input:file").button();
 
                         var postForm = app.docForm( "form#item_details", {
                             id : data['docid'],
-                            fields : allfields,
+                            fields : allFields,
                             onLoad : function(doc) {
                                 if( doc.tags ) {
                                     doc.tags = doc.tags.join(" ");
@@ -267,6 +277,18 @@
 
             });
         });
+
+        /*
+         * show the tag cloud
+         */
+        this.bind( 'show-tag-cloud', function(e,data ) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function( app ) {
+                self.appendAjaxResp( app.listPath("tag-cloud", "tagcloud")+"?group=true", "#content" );
+            });
+        });
+
     });
 
     $(function() {
