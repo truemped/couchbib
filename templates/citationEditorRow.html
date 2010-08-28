@@ -1,0 +1,7 @@
+    var name = "{{name}}";
+    presets.push( name );
+
+    citations[name] = [];
+    {{#citations}}
+    citations[name].push( { "type" : "{{type}}", "view" : "{{{view}}}" } );
+    {{/citations}}
