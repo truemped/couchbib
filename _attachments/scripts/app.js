@@ -23,6 +23,10 @@
             context.trigger( 'show-tag-cloud' );
         });
 
+        this.get('#/tag/:tag', function(context) {
+            context.trigger( 'show-by-tag', { tag : this.params['tag'] } );
+        });
+
         this.get('#/search', function(context) {
             context.trigger( 'search', {} );
         });
@@ -275,6 +279,16 @@
             });
         });
 
+        /*
+         * show all elements matching a specific tag
+         */
+        this.bind( 'show-by-tag', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function( app ) {
+                self.appendAjaxResp( app.listPath("tag-items", "tagcloud")+"?reduce=false&include_docs=true&key=%22"+data.tag+"%22", "#content" );
+            });
+        });
     });
 
     $(function() {
