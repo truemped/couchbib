@@ -1,36 +1,5 @@
 ;(function($) {
 
-    /*
-     * Some couchdb helper functions for sammy.
-     */
-    var CouchDbHelpers = function( app ) {
-
-        this.helpers( {
-            withCouchApp: function(callback) {
-                $.couch.app( function( app ) {
-                    var path = app.require( "vendor/sammy/lib/path" ).init( app.req );
-                    $.extend( app, path );
-                    callback( app );
-                });
-            },
-            // append an ajax get request to the selector
-            appendAjaxResp : function( url, selector ) {
-                $.ajax( {
-                    type : "GET",
-                    dataType : "html",
-                    url : url,
-                    success : function(resp) {
-                        $(selector).append(resp);
-                    },
-                    error : function( xhr, msg, e ) {
-                        alert( msg );
-                    }
-                });
-            },
-        });
-
-    };
-
     var app = $.sammy( function() {
         this.use( Sammy.Title );
         this.use( Sammy.Mustache );
@@ -208,16 +177,12 @@
                             doc.has_attachments = true;
                         }
 
+                        // update the ui
                         $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
                         $("#itemDetails").tabs();
-                        $("#deleteDoc").bind( 'click', function() {
-                            if( confirm( "Eintrag wirklich löschen?" ) ) {
-                                app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
-                                self.redirect( "#/newest" );
-                            }
-                        });
                         $("button, input:submit, input:file").button();
 
+                        // bind the form to the document
                         var postForm = app.docForm( "form#item_details", {
                             id : data['docid'],
                             fields : allFields,
@@ -246,6 +211,14 @@
                             },
                         });
 
+                        // activate the delete button
+                        $("#deleteDoc").bind( 'click', function() {
+                            if( confirm( "Eintrag wirklich löschen?" ) ) {
+                                app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
+                                self.redirect( "#/newest" );
+                            }
+                        });
+
                         // add the attachment uploading
                         $("form#upload_attachment").submit( function(e) {
                             e.preventDefault();
@@ -263,19 +236,32 @@
                                 return;
                             }
 
+                            var docUrl = [app.db.uri, data._id].join('/');
                             $(this).ajaxSubmit({
-                                url:  [app.db.uri, data['docid']].join('/'),
+                                url: docUrl,
                                 success: function(resp) {
                                     alert('Anhang hinzugefügt!');
-                                    self.trigger( "show-item-details", { docid:data['docid'] } );
+                                    self.trigger( "show-item-details", { docid:data._id } );
                                 }
                             });
                         });
+
+                        // add the attachment deletion
+                        $(".deleteattachments").click( function() {
+                            var url = $(this).attr('name');
+                            deleteAttachment( url );
+                            self.trigger( "show-item-details", { docid:data['docid'] } );
+                        });
+
+                        // add the nice editor for notes
+                        $("#nice_editor").markItUp(myMarkdownSettings);
+
                     }
                 });
 
 
             });
+
         });
 
         /*
