@@ -28,8 +28,8 @@
 
 {{#regular}}
 <div id="tab_notes" >
-    <textarea name="note" id="nice_editor" cols="80" rows="30"></textarea><br/>
-    <input type="submit" value="Speichern" class="wymupdate" />
+    <textarea name="note" id="nice_editor"></textarea><br/>
+    <input type="submit" value="Speichern" />
 </div>
 {{/regular}}
 
@@ -46,6 +46,7 @@
 
     <p>Neuer Anhang: 
     <form method="POST" id="upload_attachment">
+        <input type="hidden" name="_id" value="{{_id}}">
         <input type="hidden" name="_rev" value="{{_rev}}">
         <input name="_attachments" type="file"/>
         <input type="submit" value="Hinzufügen"/>
@@ -55,63 +56,3 @@
 {{/regular}}
 
 </div>
-
-<script>
-
-
-    $.couch.app( function(app) {
-
-        {{#regular}}
-
-        // add the attachment uploading
-        $("form#upload_attachment").submit( function(e) {
-            e.preventDefault();
-
-            var data = {};
-            $.each($("form#upload_attachment :input").serializeArray(), function(i, field) {
-                data[field.name] = field.value;
-            });
-            $("form#upload_attachment :file").each(function() {
-                data[this.name] = this.value; // file inputs need special handling
-            });
-
-            if (!data._attachments || data._attachments.length == 0) {
-                alert("Bitte eine Datei zum Speichen auswählen");
-                return;
-            }
-
-            $(this).ajaxSubmit({
-                url:  [app.db.uri, "{{_id}}"].join('/'),
-                success: function(resp) {
-                    alert('Anhang hinzugefügt!');
-                    window.location.reload();
-                }
-            });
-        });
-
-        {{/regular}}
-
-    });
-
-    {{#regular}}
-
-    // add the nice editor
-    $("#nice_editor").wymeditor({
-        html : "{{{note}}}",
-        toolsItems: [
-            {'name': 'Bold', 'title': 'Strong', 'css': 'wym_tools_strong'}, 
-            {'name': 'Italic', 'title': 'Emphasis', 'css': 'wym_tools_emphasis'},
-            {'name': 'Superscript', 'title': 'Superscript', 'css': 'wym_tools_superscript'},
-            {'name': 'Subscript', 'title': 'Subscript', 'css': 'wym_tools_subscript'},
-            {'name': 'InsertOrderedList', 'title': 'Ordered_List', 'css': 'wym_tools_ordered_list'},
-            {'name': 'InsertUnorderedList', 'title': 'Unordered_List', 'css': 'wym_tools_unordered_list'},
-            {'name': 'Indent', 'title': 'Indent', 'css': 'wym_tools_indent'},
-            {'name': 'Outdent', 'title': 'Outdent', 'css': 'wym_tools_outdent'},
-            {'name': 'Undo', 'title': 'Undo', 'css': 'wym_tools_undo'},
-            {'name': 'Redo', 'title': 'Redo', 'css': 'wym_tools_redo'},
-        ]
-    });
-
-    {{/regular}}
-
-</script>
