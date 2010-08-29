@@ -253,7 +253,15 @@
                         // add the attachment deletion
                         $(".deleteattachments").click( function() {
                             var url = $(this).attr('name');
-                            deleteAttachment( url );
+                            if( confirm("Wirklich löschen?") ) {
+                                $.ajax( {
+                                    type : "DELETE",
+                                    url : url,
+                                    success: function() {
+                                        alert('Wurde gelöscht');
+                                    }
+                                });
+                            }
                             self.trigger( "show-item-details", { docid:data['docid'] } );
                         });
 
