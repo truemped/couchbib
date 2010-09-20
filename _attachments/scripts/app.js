@@ -316,7 +316,7 @@
             self.withCouchApp( function(app) {
                 $("#content").append(app.ddoc.templates.search);
 
-                var query = "", options="&include_docs=true";
+                var query = "", options="&limit=10"; // &include_docs=true
 
                 if(data.params.author && data.params.author.length > 0) {
                     query += "author:("+data.params.author+") ";
@@ -347,17 +347,31 @@
                             resp.rows.map( function( row ) {
                                 if( typeof( row.fields.author ) === "object" ) {
                                     $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
-                                        { id : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) } ) );
+                                        { docid : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) } ) );
                                 } else {
                                     $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
-                                        { id : row.id, title : row.fields.title, author : row.fields.author } ) );
+                                        { docid : row.id, title : row.fields.title, author : row.fields.author } ) );
                                 }
                                 idx++;
                             });
 
-                            //
-                            // TODO implement paging
-                            //
+                            if( resp.total_rows > 10 ) {
+                                var paging = {
+                                    baseurl : "#/search/query?author="+data.params.author+"&title="+data.params.title+"&"
+                                        + "tags="+data.params.tags,
+                                    next : false,
+                                    previous : false
+                                };
+                                if( resp.skip > 0 ) {
+                                    // show the prev button
+                                    paging.previous = "&skip="+(resp.skip - 10);
+                                }
+                                if( resp.skip < resp.total_rows - 10 ) {
+                                    // show the next button
+                                    paging.next = "&skip="+(resp.skip + 10);
+                                }
+                                $("#search_paging").append( self.mustache( app.ddoc.templates.searchResultPaging, paging ) );
+                            }
                         }
                     },
                     error : function( xhr, msg, e ) {

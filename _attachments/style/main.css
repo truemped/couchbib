@@ -73,3 +73,7 @@ div.avatar img {
 #items ul {
   list-style: none;
 }
+
+#search_paging {
+  text-align: center;
+}
