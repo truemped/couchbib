@@ -18,7 +18,7 @@ function(doc) {
     }
 
     if( doc.publisher ) {
-        ret.add( doc.publisher, { field : "publisher" } );
+        ret.add( doc.publisher, { field : "publisher", store : "yes" } );
     }
 
     if( doc.month ) {
@@ -26,7 +26,7 @@ function(doc) {
     }
 
     if( doc.year ) {
-        ret.add( doc.year, { field : "year" } );
+        ret.add( doc.year, { field : "year", store : "yes" } );
     }
 
     if( doc.editor ) {
