@@ -137,6 +137,7 @@
                             self.redirect( "#/doc/"+localDoc._id );
                         }
                     });
+                    $("button, input:submit, input:file").button();
                 } else {
                     alert( "Unbekannter Typ!" );
                 }
@@ -307,6 +308,7 @@
             var self = this;
             self.withCouchApp( function(app) {
                 $("#content").append(app.ddoc.templates.search);
+                $("button, input:submit, input:file").button();
             });
         });
 
@@ -315,6 +317,7 @@
             var self = this;
             self.withCouchApp( function(app) {
                 $("#content").append(app.ddoc.templates.search);
+                $("button, input:submit, input:file").button();
 
                 var query = "", options="&limit=10"; // &include_docs=true
 
