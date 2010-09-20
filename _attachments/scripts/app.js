@@ -58,6 +58,11 @@
                     typedesc.push( { id : idx, name : types[idx]['name'] } );
                 }
                 $("#newDocTypeList").append( context.mustache( template, { typedesc : typedesc } ) );
+
+                // and now some db maintenance:
+//                app.db.compact();
+//                app.db.viewCleanup();
+//                app.db.compactView();
             });
         });
 
