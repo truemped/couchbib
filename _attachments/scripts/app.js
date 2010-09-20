@@ -1,35 +1,11 @@
 ;(function($) {
 
-
     var app = $.sammy( function() {
         this.use( Sammy.Title );
         this.use( Sammy.Mustache );
+        this.use( CouchDbHelpers );
 
         this.setTitle( 'couchbib' );
-
-        this.helpers( {
-            withCouchApp: function(callback) {
-                $.couch.app( function( app ) {
-                    var path = app.require( "vendor/sammy/lib/path" ).init( app.req );
-                    $.extend( app, path );
-                    callback( app );
-                });
-            },
-            // append an ajax get request to the selector
-            appendAjaxResp : function( url, selector ) {
-                $.ajax( {
-                    type : "GET",
-                    dataType : "html",
-                    url : url,
-                    success : function(resp) {
-                        $(selector).append(resp);
-                    },
-                    error : function( xhr, msg, e ) {
-                        alert( msg );
-                    }
-                });
-            },
-        });
 
         this.get('#/', function(context) {
             context.redirect( '#/newest' );
@@ -47,12 +23,16 @@
             context.trigger( 'show-tag-cloud' );
         });
 
+        this.get('#/tag/:tag', function(context) {
+            context.trigger( 'show-by-tag', { tag : this.params['tag'] } );
+        });
+
         this.get('#/search', function(context) {
             context.trigger( 'search', {} );
         });
 
-        this.get('#/search/:query', function(context) {
-            context.trigger( 'search', { query :  this.params['query'] } );
+        this.get('#/search/query', function(context) {
+            context.trigger( 'searchQuery', { params :  this.params } );
         });
 
         this.get('#/new/:doctype', function(context) {
@@ -78,6 +58,11 @@
                     typedesc.push( { id : idx, name : types[idx]['name'] } );
                 }
                 $("#newDocTypeList").append( context.mustache( template, { typedesc : typedesc } ) );
+
+                // and now some db maintenance:
+//                app.db.compact();
+//                app.db.viewCleanup();
+//                app.db.compactView();
             });
         });
 
@@ -114,12 +99,12 @@
                     }
                     doc.fields.push( { id : "tags", name : app.ddoc.fieldnames[ "tags" ] } );
 
-                    $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
-                    $("#itemDetails").tabs();
-
                     var allFields = ["citekey"];
                     allFields = allFields.concat( type.fields );
                     allFields.push( "tags" );
+
+                    $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
+                    $("#itemDetails").tabs();
 
                     var postForm = app.docForm( "form#item_details", {
                         fields : allFields,
@@ -154,9 +139,10 @@
                             }
                         },
                         success : function( resp, localDoc ) {
-                            self.trigger("show-item-details", { docid : localDoc._id } );
+                            self.redirect( "#/doc/"+localDoc._id );
                         }
                     });
+                    $("button, input:submit, input:file").button();
                 } else {
                     alert( "Unbekannter Typ!" );
                 }
@@ -176,17 +162,19 @@
                     success : function(doc) {
 
                         var type = app.ddoc.types[ doc.type ];
-                        var allfields = type.fields;
-                        allfields.splice( 0,0,"citekey" );
-                        allfields.push("tags");
+                        doc.fields = [ { id : "citekey", name : app.ddoc.fieldnames[ "citekey" ] } ];
 
-                        doc.regular = true;
-                        doc.fields = [];
-                        for( var idx in allfields ) {
+                        var allFields = ["citekey"];
+                        allFields = allFields.concat( type.fields );
+                        allFields.push( "tags" );
+
+                        for( var idx in type.fields ) {
                             if( type.fields[idx].indexOf( "note" ) == -1 ) {
-                                doc.fields[ idx ] = { id : type.fields[idx], name : app.ddoc.fieldnames[ type.fields[idx] ] };
+                                doc.fields.push( { id : type.fields[idx], name : app.ddoc.fieldnames[ type.fields[idx] ] } );
                             }
                         }
+                        doc.fields.push( { id : "tags", name : app.ddoc.fieldnames[ "tags" ] } );
+                        doc.regular = true;
 
                         // add all the attachments
                         doc.attachments = "";
@@ -199,18 +187,15 @@
                             doc.has_attachments = true;
                         }
 
+                        // update the ui
                         $("#content").append( self.mustache( app.ddoc.templates.itemdetails, doc ) );
                         $("#itemDetails").tabs();
-                        $("#deleteDoc").bind( 'click', function() {
-                            if( confirm( "Eintrag wirklich löschen?" ) ) {
-                                app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
-                            }
-                        });
                         $("button, input:submit, input:file").button();
 
+                        // bind the form to the document
                         var postForm = app.docForm( "form#item_details", {
                             id : data['docid'],
-                            fields : allfields,
+                            fields : allFields,
                             onLoad : function(doc) {
                                 if( doc.tags ) {
                                     doc.tags = doc.tags.join(" ");
@@ -236,6 +221,15 @@
                             },
                         });
 
+                        // activate the delete button
+                        $("#deleteDoc").bind( 'click', function() {
+                            if( confirm( "Eintrag wirklich löschen?" ) ) {
+                                app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
+                                $("#content").empty();
+                                self.redirect( "#/newest" );
+                            }
+                        });
+
                         // add the attachment uploading
                         $("form#upload_attachment").submit( function(e) {
                             e.preventDefault();
@@ -253,18 +247,145 @@
                                 return;
                             }
 
+                            var docUrl = [app.db.uri, data._id].join('/');
                             $(this).ajaxSubmit({
-                                url:  [app.db.uri, data['docid']].join('/'),
+                                url: docUrl,
                                 success: function(resp) {
                                     alert('Anhang hinzugefügt!');
-                                    self.trigger( "show-item-details", { docid:data['docid'] } );
+                                    self.trigger( "show-item-details", { docid:data._id } );
                                 }
                             });
                         });
+
+                        // add the attachment deletion
+                        $(".deleteattachments").click( function() {
+                            var url = $(this).attr('name');
+                            if( confirm("Wirklich löschen?") ) {
+                                $.ajax( {
+                                    type : "DELETE",
+                                    url : url,
+                                    success: function() {
+                                        alert('Wurde gelöscht');
+                                    }
+                                });
+                            }
+                            self.trigger( "show-item-details", { docid:data['docid'] } );
+                        });
+
+                        // add the nice editor for notes
+                        $("#nice_editor").markItUp(myMarkdownSettings);
+
                     }
                 });
 
 
+            });
+
+        });
+
+        /*
+         * show the tag cloud
+         */
+        this.bind( 'show-tag-cloud', function(e,data ) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function( app ) {
+                self.appendAjaxResp( app.listPath("tag-cloud", "tagcloud")+"?group=true", "#content" );
+            });
+        });
+
+        /*
+         * show all elements matching a specific tag
+         */
+        this.bind( 'show-by-tag', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function( app ) {
+                self.appendAjaxResp( app.listPath("tag-items", "tagcloud")+"?reduce=false&include_docs=true&key=%22"+data.tag+"%22", "#content" );
+            });
+        });
+
+        /*
+         * all the search handling
+         */
+        this.bind( 'search', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function(app) {
+                $("#content").append(app.ddoc.templates.search);
+                $("button, input:submit, input:file").button();
+            });
+        });
+
+        this.bind( 'searchQuery', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function(app) {
+                $("#content").append(app.ddoc.templates.search);
+                $("button, input:submit, input:file").button();
+
+                var query = "", options="&limit=10"; // &include_docs=true
+
+                if(data.params.author && data.params.author.length > 0) {
+                    query += "author:("+data.params.author+") ";
+                    $("#search_form [name=author]").val( data.params.author );
+                }
+                if(data.params.tags && data.params.tags.length > 0) {
+                    query += "tags:("+data.params.tags+") ";
+                    $("#search_form [name=tags]").val( data.params.tags );
+                }
+                if(data.params.title && data.params.title.length > 0) {
+                    query += "title:("+data.params.title+")";
+                    $("#search_form [name=title]").val( data.params.title );
+                }
+                if(data.params.skip && data.params.skip.length > 0 ) {
+                    options += "&skip="+data.params.skip;
+                }
+
+                var url = "/"+app.db.name+"/_fti/_design/couchbib/shelf?q="+query+options;
+                $.ajax( {
+                    type : "GET",
+                    dataType : "json",
+                    url : url,
+                    success : function( resp ) {
+                        var results = [], idx = 0;
+
+                        if( resp.rows && resp.rows.length > 0 ) {
+                            // we have results
+                            resp.rows.map( function( row ) {
+                                if( typeof( row.fields.author ) === "object" ) {
+                                    $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
+                                        { docid : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) } ) );
+                                } else {
+                                    $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
+                                        { docid : row.id, title : row.fields.title, author : row.fields.author } ) );
+                                }
+                                idx++;
+                            });
+
+                            if( resp.total_rows > 10 ) {
+                                var paging = {
+                                    baseurl : "#/search/query?author="+data.params.author+"&title="+data.params.title+"&"
+                                        + "tags="+data.params.tags,
+                                    next : false,
+                                    previous : false
+                                };
+                                if( resp.skip > 0 ) {
+                                    // show the prev button
+                                    paging.previous = "&skip="+(resp.skip - 10);
+                                }
+                                if( resp.skip < resp.total_rows - 10 ) {
+                                    // show the next button
+                                    paging.next = "&skip="+(resp.skip + 10);
+                                }
+                                $("#search_paging").append( self.mustache( app.ddoc.templates.searchResultPaging, paging ) );
+                            }
+                        }
+                    },
+                    error : function( xhr, msg, e ) {
+                        alert( msg );
+                    }
+                });
             });
         });
     });

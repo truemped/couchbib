@@ -1,0 +1,58 @@
+<div id="itemDetails">
+
+<ul>
+    <li><a href="#tab_properties">Eigenschaften</a></li>
+    {{#regular}}
+    <li><a href="#tab_notes">Notizen</a></li>
+    <li><a href="#tab_attachments">Anhänge</a></li>
+    {{/regular}}
+</ul>
+
+<form id="item_details" method="post">
+
+<div id="tab_properties">
+<table border="0">
+{{#fields}}
+    <tr>
+        <td>{{name}}</td>
+        <td><input type="text" size="50" name="{{id}}" value="" /></td>
+    </tr>
+{{/fields}}
+</table>
+
+<input type="submit" value="Speichern" />
+{{#regular}}
+<button id="deleteDoc">Löschen</button>
+{{/regular}}
+</div>
+
+{{#regular}}
+<div id="tab_notes" >
+    <textarea name="note" id="nice_editor"></textarea><br/>
+    <input type="submit" value="Speichern" />
+</div>
+{{/regular}}
+
+</form>
+
+{{#regular}}
+<div id="tab_attachments">
+
+    {{#has_attachments}}
+    <div id="existing_attachments">
+        {{{attachments}}}
+    </div><hr/>
+    {{/has_attachments}}
+
+    <p>Neuer Anhang: 
+    <form method="POST" id="upload_attachment">
+        <input type="hidden" name="_id" value="{{_id}}">
+        <input type="hidden" name="_rev" value="{{_rev}}">
+        <input name="_attachments" type="file"/>
+        <input type="submit" value="Hinzufügen"/>
+    </form>
+    </p>
+</div>
+{{/regular}}
+
+</div>
