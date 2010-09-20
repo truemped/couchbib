@@ -346,13 +346,14 @@
                             // we have results
                             resp.rows.map( function( row ) {
                                 if( typeof( row.fields.author ) === "object" ) {
-                                    results[idx] = { id : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) };
+                                    $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
+                                        { id : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) } ) );
                                 } else {
-                                    results[idx] = { id : row.id, title : row.fields.title, author : row.fields.author };
+                                    $("#search_results").append( self.mustache( app.ddoc.templates.newestItems,
+                                        { id : row.id, title : row.fields.title, author : row.fields.author } ) );
                                 }
                                 idx++;
                             });
-                            $("#search_results").append( self.mustache( app.ddoc.templates.searchResults, { results : results } ) );
 
                             //
                             // TODO implement paging
