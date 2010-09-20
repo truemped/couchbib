@@ -31,8 +31,8 @@
             context.trigger( 'search', {} );
         });
 
-        this.get('#/search/:query', function(context) {
-            context.trigger( 'search', { query :  this.params['query'] } );
+        this.get('#/search/query', function(context) {
+            context.trigger( 'searchQuery', { params :  this.params } );
         });
 
         this.get('#/new/:doctype', function(context) {
@@ -219,6 +219,7 @@
                         $("#deleteDoc").bind( 'click', function() {
                             if( confirm( "Eintrag wirklich löschen?" ) ) {
                                 app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
+                                $("#content").empty();
                                 self.redirect( "#/newest" );
                             }
                         });
@@ -295,6 +296,73 @@
             var self = this;
             self.withCouchApp( function( app ) {
                 self.appendAjaxResp( app.listPath("tag-items", "tagcloud")+"?reduce=false&include_docs=true&key=%22"+data.tag+"%22", "#content" );
+            });
+        });
+
+        /*
+         * all the search handling
+         */
+        this.bind( 'search', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function(app) {
+                $("#content").append(app.ddoc.templates.search);
+            });
+        });
+
+        this.bind( 'searchQuery', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function(app) {
+                $("#content").append(app.ddoc.templates.search);
+
+                var query = "", options="&include_docs=true";
+
+                if(data.params.author && data.params.author.length > 0) {
+                    query += "author:("+data.params.author+") ";
+                    $("#search_form [name=author]").val( data.params.author );
+                }
+                if(data.params.tags && data.params.tags.length > 0) {
+                    query += "tags:("+data.params.tags+") ";
+                    $("#search_form [name=tags]").val( data.params.tags );
+                }
+                if(data.params.title && data.params.title.length > 0) {
+                    query += "title:("+data.params.title+")";
+                    $("#search_form [name=title]").val( data.params.title );
+                }
+                if(data.params.skip && data.params.skip.length > 0 ) {
+                    options += "&skip="+data.params.skip;
+                }
+
+                var url = "/"+app.db.name+"/_fti/_design/couchbib/shelf?q="+query+options;
+                $.ajax( {
+                    type : "GET",
+                    dataType : "json",
+                    url : url,
+                    success : function( resp ) {
+                        var results = [], idx = 0;
+
+                        if( resp.rows && resp.rows.length > 0 ) {
+                            // we have results
+                            resp.rows.map( function( row ) {
+                                if( typeof( row.fields.author ) === "object" ) {
+                                    results[idx] = { id : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) };
+                                } else {
+                                    results[idx] = { id : row.id, title : row.fields.title, author : row.fields.author };
+                                }
+                                idx++;
+                            });
+                            $("#search_results").append( self.mustache( app.ddoc.templates.searchResults, { results : results } ) );
+
+                            //
+                            // TODO implement paging
+                            //
+                        }
+                    },
+                    error : function( xhr, msg, e ) {
+                        alert( msg );
+                    }
+                });
             });
         });
     });
