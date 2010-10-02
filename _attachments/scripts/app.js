@@ -440,6 +440,7 @@
                     $("#savecitation").bind( 'click', function() {
                         $("#typeselector option:selected").each( function() {
                             doc.types[ $(this).val() ] = $("#citationeditor #citationformat").val();
+                            doc.bibliography[ $(this).val() ] = $("#citationeditor #bibliographyformat").val();
                             app.db.saveDoc( doc );
                         });
                     });
@@ -450,8 +451,10 @@
                             updateFieldHelp( selectedType );
                             if( doc.types[ selectedType ] ) {
                                 $("#citationeditor #citationformat").val( doc.types[ selectedType ] );
+                                $("#citationeditor #bibliographyformat").val( doc.bibliography[ selectedType ] );
                             }else {
                                 $("#citationeditor #citationformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
+                                $("#citationeditor #bibliographyformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
                             }
                         });
                     });
@@ -463,7 +466,7 @@
                     },
                     error : function() {
                         // the document was not found. create a new one
-                        var doc = { _id : "citationformats" };
+                        var doc = { _id : "citationformats", types : {}, bibliography : {} };
                         showEditor( doc );
                     }
                 });
