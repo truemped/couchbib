@@ -414,6 +414,61 @@
          * The citation editor.
          */
         this.bind( 'show-citation-editor', function() {
+            $("#content").empty();
+            var self = this;
+            self.withCouchApp( function( app ) {
+
+                var updateFieldHelp = function( type ) {
+                    $("#availableCitationFields").empty();
+                    var types = [];
+                    for( var idx in app.ddoc.types[ type ].fields ) {
+                        var fieldId = app.ddoc.types[type].fields[idx];
+                        types.push( { typeid : fieldId, typename : app.ddoc.fieldnames[ fieldId ] } );
+                    }
+                    $("#availableCitationFields").append( self.mustache( app.ddoc.templates.availableCitationFields, { types : types } ) );
+                }
+
+                var showEditor = function( doc ) {
+
+                    var data = { types : [] };
+                    // prepare the typeselector
+                    for( var idx in app.ddoc.types ) {
+                        data.types.push( { type : idx, name : app.ddoc.types[idx].name } );
+                    }
+                    $("#content").append( self.mustache( app.ddoc.templates.citationEditor, data ) );
+                    $("button").button();
+                    $("#savecitation").bind( 'click', function() {
+                        $("#typeselector option:selected").each( function() {
+                            doc.types[ $(this).val() ] = $("#citationeditor #citationformat").val();
+                            app.db.saveDoc( doc );
+                        });
+                    });
+
+                    $("#typeselector").bind( 'change', function() {
+                        $("#typeselector option:selected").each( function() {
+                            var selectedType = $(this).val();
+                            updateFieldHelp( selectedType );
+                            if( doc.types[ selectedType ] ) {
+                                $("#citationeditor #citationformat").val( doc.types[ selectedType ] );
+                            }else {
+                                $("#citationeditor #citationformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
+                            }
+                        });
+                    });
+                }
+
+                app.db.openDoc( "citationformats", {
+                    success : function( doc ) {
+                        showEditor( doc );
+                    },
+                    error : function() {
+                        // the document was not found. create a new one
+                        var doc = { _id : "citationformats" };
+                        showEditor( doc );
+                    }
+                });
+
+            });
         });
 
     });
@@ -421,4 +476,5 @@
     $(function() {
         app.run('#/')
     });
+
 })(jQuery);
