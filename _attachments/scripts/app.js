@@ -39,6 +39,10 @@
             context.trigger( 'new-item', { doctype : this.params['doctype'] } );
         });
 
+        this.get('#/citations', function(context) {
+            context.trigger( 'show-citation-editor', {} );
+        });
+
 
         /*
          * run initializing code
@@ -404,6 +408,14 @@
                 });
             });
         });
+
+
+        /**
+         * The citation editor.
+         */
+        this.bind( 'show-citation-editor', function() {
+        });
+
     });
 
     $(function() {
