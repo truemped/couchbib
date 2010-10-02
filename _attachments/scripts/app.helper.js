@@ -12,8 +12,8 @@ var CouchDbHelpers = function( app ) {
                 callback( app );
             });
         },
-        // append an ajax get request to the selector
         appendAjaxResp : function( url, selector ) {
+            // append an ajax get request to the selector
             $.ajax( {
                 type : "GET",
                 dataType : "html",
@@ -25,6 +25,22 @@ var CouchDbHelpers = function( app ) {
                     alert( msg );
                 }
             });
+        },
+        alertDialog : function( message, options ) {
+            // show a simple modal alert dialog
+            var opt = {
+                modal : true,
+                resizable : false,
+                buttons : {
+                    Ok : function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            }
+            $.extend( true, opt, options );
+            $("#dialog").empty();
+            $("#dialog").append( message );
+            $("#dialog").dialog( opt );
         },
     });
 

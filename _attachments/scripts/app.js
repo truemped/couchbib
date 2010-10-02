@@ -144,7 +144,7 @@
                     });
                     $("button, input:submit, input:file").button();
                 } else {
-                    alert( "Unbekannter Typ!" );
+                    self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Unbekannter Typ!" } ) );
                 }
             });
         });
@@ -223,11 +223,19 @@
 
                         // activate the delete button
                         $("#deleteDoc").bind( 'click', function() {
-                            if( confirm( "Eintrag wirklich löschen?" ) ) {
-                                app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
-                                $("#content").empty();
-                                self.redirect( "#/newest" );
-                            }
+                            self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
+                                buttons : {
+                                    Ok : function() {
+                                        app.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
+                                        $("#content").empty();
+                                        self.redirect( "#/newest" );
+                                        $( this ).dialog( "close" );
+                                    },
+                                    Abbrechen : function () {
+                                        $( this ).dialog( "close" );
+                                    }
+                                }
+                            });
                         });
 
                         // add the attachment uploading
@@ -243,7 +251,7 @@
                             });
 
                             if (!data._attachments || data._attachments.length == 0) {
-                                alert("Bitte eine Datei zum Speichen auswählen");
+                                self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Bitte eine Datei zum Speichen auswählen!" } ));
                                 return;
                             }
 
@@ -251,7 +259,7 @@
                             $(this).ajaxSubmit({
                                 url: docUrl,
                                 success: function(resp) {
-                                    alert('Anhang hinzugefügt!');
+                                    self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Anhang hinzugefügt!" } ) );
                                     self.trigger( "show-item-details", { docid:data._id } );
                                 }
                             });
@@ -260,16 +268,24 @@
                         // add the attachment deletion
                         $(".deleteattachments").click( function() {
                             var url = $(this).attr('name');
-                            if( confirm("Wirklich löschen?") ) {
-                                $.ajax( {
-                                    type : "DELETE",
-                                    url : url,
-                                    success: function() {
-                                        alert('Wurde gelöscht');
+                            self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
+                                buttons : {
+                                    Ok : function() {
+                                        $( this ).dialog( "close" );
+                                        $.ajax( {
+                                            type : "DELETE",
+                                            url : url,
+                                            success: function() {
+                                                self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : "Wurde gelöscht" } ) );
+                                                self.trigger( "show-item-details", { docid:data['docid'] } );
+                                            }
+                                        });
+                                    },
+                                    Abbrechen : function () {
+                                        $( this ).dialog( "close" );
                                     }
-                                });
-                            }
-                            self.trigger( "show-item-details", { docid:data['docid'] } );
+                                }
+                            });
                         });
 
                         // add the nice editor for notes
@@ -383,7 +399,7 @@
                         }
                     },
                     error : function( xhr, msg, e ) {
-                        alert( msg );
+                        self.alertDialog( self.mustache( app.ddoc.templates.messagedialog, { message : msg } ) );
                     }
                 });
             });
