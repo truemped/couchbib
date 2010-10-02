@@ -14,7 +14,7 @@ Features
 
 - attach custom files (like the article's PDF)
 - take notes for yourself
-- tag each item and browse through you collection with a tag-cloud
+- tag each item and browse through your collection with a tag-cloud
 - search the items using [couchdb-lucene][]
 
 [couchdb-lucene]: http://github.com/rnewson/couchdb-lucene
