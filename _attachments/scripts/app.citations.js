@@ -24,8 +24,8 @@
                         $("#citationeditor #citationformat").val( doc.types[ selectedType ] );
                         $("#citationeditor #bibliographyformat").val( doc.bibliography[ selectedType ] );
                     }else {
-                        $("#citationeditor #citationformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
-                        $("#citationeditor #bibliographyformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
+                        $("#citationeditor #citationformat").val( "<b>{{author}}</b>, <i>{{title}}, {{year}}</i>" );
+                        $("#citationeditor #bibliographyformat").val( "<b>{{author}}</b>, <i>{{title}}, {{year}}</i>" );
                     }
                 });
             }
