@@ -16,6 +16,20 @@
                 $("#availableCitationFields").append( context.mustache( couchapp.ddoc.templates.availableCitationFields, { types : types } ) );
             }
 
+            var updateUi = function( doc ) {
+                $("#typeselector option:selected").each( function() {
+                    var selectedType = $(this).val();
+                    updateFieldHelp( selectedType );
+                    if( doc.types[ selectedType ] ) {
+                        $("#citationeditor #citationformat").val( doc.types[ selectedType ] );
+                        $("#citationeditor #bibliographyformat").val( doc.bibliography[ selectedType ] );
+                    }else {
+                        $("#citationeditor #citationformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
+                        $("#citationeditor #bibliographyformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
+                    }
+                });
+            }
+
             var showEditor = function( doc ) {
 
                 var data = { types : [] };
@@ -24,6 +38,8 @@
                     data.types.push( { type : idx, name : couchapp.ddoc.types[idx].name } );
                 }
                 $("#content").append( context.mustache( couchapp.ddoc.templates.citationEditor, data ) );
+                $("#typeselector option:first").attr( 'selected', true );
+
                 $("button").button();
                 $("#savecitation").bind( 'click', function() {
                     $("#typeselector option:selected").each( function() {
@@ -34,18 +50,9 @@
                 });
 
                 $("#typeselector").bind( 'change', function() {
-                    $("#typeselector option:selected").each( function() {
-                        var selectedType = $(this).val();
-                        updateFieldHelp( selectedType );
-                        if( doc.types[ selectedType ] ) {
-                            $("#citationeditor #citationformat").val( doc.types[ selectedType ] );
-                            $("#citationeditor #bibliographyformat").val( doc.bibliography[ selectedType ] );
-                        }else {
-                            $("#citationeditor #citationformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
-                            $("#citationeditor #bibliographyformat").val( "<b>{{author}}</b> {{year}}, <i>{{title}}</i>" );
-                        }
-                    });
+                    updateUi( doc );
                 });
+                updateUi( doc );
             }
 
             couchapp.db.openDoc( "citationformats", {
