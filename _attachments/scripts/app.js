@@ -87,31 +87,6 @@
             });
         });
 
-
-        /*
-         * show the input for a new entry
-         */
-        this.bind( 'new-item', function(e, data) {
-            $("#content").empty();
-            var self = this;
-            this.withCouchApp( function(app) {
-                self.createNewItem( app, data );
-            });
-        });
-
-
-        /*
-         * Show the item details
-         */
-        this.bind( 'show-item-details', function(e, data) {
-            $("#content").empty();
-            var self = this;
-            this.withCouchApp( function( app ) {
-                self.editItem( app, data );
-            });
-
-        });
-
         /*
          * show the tag cloud
          */
@@ -133,39 +108,6 @@
                 self.appendAjaxResp( app.listPath("tag-items", "tagcloud")+"?reduce=false&include_docs=true&key=%22"+data.tag+"%22", "#content" );
             });
         });
-
-        /*
-         * all the search handling
-         */
-        this.bind( 'search', function(e,data) {
-            $("#content").empty();
-            var self = this;
-            self.withCouchApp( function(app) {
-                $("#content").append(app.ddoc.templates.search);
-                $("button, input:submit, input:file").button();
-            });
-        });
-
-        this.bind( 'searchQuery', function(e,data) {
-            $("#content").empty();
-            var self = this;
-            this.withCouchApp( function(app) {
-                self.search( app, data );
-            });
-        });
-
-
-        /**
-         * The citation editor.
-         */
-        this.bind( 'show-citation-editor', function() {
-            $("#content").empty();
-            var self = this;
-            self.withCouchApp( function( app ) {
-                self.showCitationEditor( app );
-            });
-        });
-
     });
 
     $(function() {

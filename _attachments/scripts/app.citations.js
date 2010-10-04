@@ -4,8 +4,7 @@
 
     Sammy.CouchBibCitations = function( app ) {
 
-        var showCitationEditor = function( couchapp ) {
-            var self = this;
+        var showCitationEditor = function( couchapp, context ) {
 
             var updateFieldHelp = function( type ) {
                 $("#availableCitationFields").empty();
@@ -14,7 +13,7 @@
                     var fieldId = couchapp.ddoc.types[type].fields[idx];
                     types.push( { typeid : fieldId, typename : couchapp.ddoc.fieldnames[ fieldId ] } );
                 }
-                $("#availableCitationFields").append( self.mustache( couchapp.ddoc.templates.availableCitationFields, { types : types } ) );
+                $("#availableCitationFields").append( context.mustache( couchapp.ddoc.templates.availableCitationFields, { types : types } ) );
             }
 
             var showEditor = function( doc ) {
@@ -24,7 +23,7 @@
                 for( var idx in couchapp.ddoc.types ) {
                     data.types.push( { type : idx, name : couchapp.ddoc.types[idx].name } );
                 }
-                $("#content").append( self.mustache( couchapp.ddoc.templates.citationEditor, data ) );
+                $("#content").append( context.mustache( couchapp.ddoc.templates.citationEditor, data ) );
                 $("button").button();
                 $("#savecitation").bind( 'click', function() {
                     $("#typeselector option:selected").each( function() {
@@ -61,7 +60,16 @@
             });
         }
 
-        app.helper( 'showCitationEditor', showCitationEditor );
+        /**
+         * The citation editor.
+         */
+        this.bind( 'show-citation-editor', function() {
+            $("#content").empty();
+            var self = this;
+            this.withCouchApp( function( couchapp ) {
+                showCitationEditor( couchapp, self );
+            });
+        });
     }
 
 })(jQuery);

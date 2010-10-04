@@ -4,12 +4,11 @@
 
     Sammy.CouchBibItemAdmin = function( app ) {
 
-        var createNewItem = function( couchapp, data ) {
-            var self = this;
+        var createNewItem = function( couchapp, data, context ) {
 
             if( !couchapp.ddoc.types[ data['doctype'] ] ) {
 
-                self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Unbekannter Typ!" } ) );
+                context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : "Unbekannter Typ!" } ) );
 
             } else {
 
@@ -28,7 +27,7 @@
                 allFields = allFields.concat( type.fields );
                 allFields.push( "tags" );
 
-                $("#content").append( self.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
+                $("#content").append( context.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
                 $("#itemDetails").tabs();
 
                 var postForm = couchapp.docForm( "form#item_details", {
@@ -64,16 +63,14 @@
                         }
                     },
                     success : function( resp, localDoc ) {
-                        self.redirect( "#/doc/"+localDoc._id );
+                        context.redirect( "#/doc/"+localDoc._id );
                     }
                 });
                 $("button, input:submit, input:file").button();
             }
         }
 
-        var editItem = function( couchapp, data ) {
-
-            var self = this;
+        var editItem = function( couchapp, data, context ) {
 
             couchapp.db.openDoc( data['docid'], {
                 success : function(doc) {
@@ -100,12 +97,12 @@
                         view.name = name;
                         view._id = doc._id;
                         view._rev = doc._rev;
-                        doc.attachments += self.mustache( couchapp.ddoc.templates.attachment, view );
+                        doc.attachments += context.mustache( couchapp.ddoc.templates.attachment, view );
                         doc.has_attachments = true;
                     }
 
                     // update the ui
-                    $("#content").append( self.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
+                    $("#content").append( context.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
                     $("#itemDetails").tabs();
                     $("button, input:submit, input:file").button();
 
@@ -140,12 +137,12 @@
 
                     // activate the delete button
                     $("#deleteDoc").bind( 'click', function() {
-                        self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
+                        context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
                             buttons : {
                                 Ok : function() {
                                     couchapp.db.removeDoc( { _id : doc._id, _rev : doc._rev } );
                                     $("#content").empty();
-                                    self.redirect( "#/newest" );
+                                    context.redirect( "#/newest" );
                                     $( this ).dialog( "close" );
                                 },
                                 Abbrechen : function () {
@@ -168,7 +165,8 @@
                         });
 
                         if (!data._attachments || data._attachments.length == 0) {
-                            self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Bitte eine Datei zum Speichen auswählen!" } ));
+                            context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog,
+                                { message : "Bitte eine Datei zum Speichen auswählen!" } ));
                             return;
                         }
 
@@ -176,8 +174,8 @@
                         $(this).ajaxSubmit({
                             url: docUrl,
                             success: function(resp) {
-                                self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Anhang hinzugefügt!" } ) );
-                                self.trigger( "show-item-details", { docid:data._id } );
+                                context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : "Anhang hinzugefügt!" } ) );
+                                context.trigger( "show-item-details", { docid:data._id } );
                             }
                         });
                     });
@@ -185,7 +183,7 @@
                     // add the attachment deletion
                     $(".deleteattachments").click( function() {
                         var url = $(this).attr('name');
-                        self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
+                        context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : "Eintrag wirklich löschen?" } ), {
                             buttons : {
                                 Ok : function() {
                                     $( this ).dialog( "close" );
@@ -193,8 +191,8 @@
                                         type : "DELETE",
                                         url : url,
                                         success: function() {
-                                            self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : "Wurde gelöscht" } ) );
-                                            self.trigger( "show-item-details", { docid:data['docid'] } );
+                                            context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : "Wurde gelöscht" } ) );
+                                            context.trigger( "show-item-details", { docid:data['docid'] } );
                                         }
                                     });
                                 },
@@ -213,8 +211,30 @@
 
         }
 
-        app.helper( 'createNewItem', createNewItem );
-        app.helper( 'editItem', editItem );
+        /*
+         * show the input for a new entry
+         */
+        this.bind( 'new-item', function(e, data) {
+            $("#content").empty();
+            var self = this;
+            this.withCouchApp( function(app) {
+                createNewItem( app, data, self );
+            });
+        });
+
+
+        /*
+         * Show the item details
+         */
+        this.bind( 'show-item-details', function(e, data) {
+            $("#content").empty();
+            var self = this;
+            this.withCouchApp( function( app ) {
+                editItem( app, data, self );
+            });
+
+        });
+
     }
 
 })(jQuery);

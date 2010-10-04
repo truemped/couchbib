@@ -4,8 +4,7 @@
 
     Sammy.CouchBibSearch = function( app ) {
 
-        var search = function( couchapp, data ) {
-            var self = this;
+        var search = function( couchapp, data, context ) {
 
             $("#content").append(couchapp.ddoc.templates.search);
             $("button, input:submit, input:file").button();
@@ -40,10 +39,10 @@
                         // we have results
                         resp.rows.map( function( row ) {
                             if( typeof( row.fields.author ) === "object" ) {
-                                $("#search_results").append( self.mustache( couchapp.ddoc.templates.newestItems,
+                                $("#search_results").append( context.mustache( couchapp.ddoc.templates.newestItems,
                                     { docid : row.id, title : row.fields.title, author : row.fields.author.join( '; ' ) } ) );
                             } else {
-                                $("#search_results").append( self.mustache( couchapp.ddoc.templates.newestItems,
+                                $("#search_results").append( context.mustache( couchapp.ddoc.templates.newestItems,
                                     { docid : row.id, title : row.fields.title, author : row.fields.author } ) );
                             }
                             idx++;
@@ -64,17 +63,35 @@
                                 // show the next button
                                 paging.next = "&skip="+(resp.skip + 10);
                             }
-                            $("#search_paging").append( self.mustache( couchapp.ddoc.templates.searchResultPaging, paging ) );
+                            $("#search_paging").append( context.mustache( couchapp.ddoc.templates.searchResultPaging, paging ) );
                         }
                     }
                 },
                 error : function( xhr, msg, e ) {
-                    self.alertDialog( self.mustache( couchapp.ddoc.templates.messagedialog, { message : msg } ) );
+                    context.alertDialog( context.mustache( couchapp.ddoc.templates.messagedialog, { message : msg } ) );
                 }
             });
         }
 
-        app.helper( 'search', search );
+        /*
+         * all the search handling
+         */
+        this.bind( 'search', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            this.withCouchApp( function(app) {
+                $("#content").append(app.ddoc.templates.search);
+                $("button, input:submit, input:file").button();
+            });
+        });
+
+        this.bind( 'searchQuery', function(e,data) {
+            $("#content").empty();
+            var self = this;
+            this.withCouchApp( function( couchapp ) {
+                search( couchapp, data, self );
+            });
+        });
     }
 
 })(jQuery);
