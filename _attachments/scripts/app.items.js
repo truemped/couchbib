@@ -94,8 +94,10 @@
                         // add the quote
                         if( citationformats && citationformats.types[doc.type] ) {
                             doc.quote = context.mustache( citationformats.types[doc.type], doc );
+                            doc.bibliography = context.mustache( citationformats.bibliography[doc.type], doc );
                         } else {
                             doc.quote = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
+                            doc.bibliography = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
                         }
 
                         // add all the attachments
