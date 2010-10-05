@@ -289,6 +289,7 @@
                     prepareEditor( citationformats );
                 },
                 error : function() {
+                    prepareEditor();
                 }
             });
 
