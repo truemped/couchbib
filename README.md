@@ -36,21 +36,21 @@ Installation
 
 Clone the project:
 
-   $ git clone http://github.com/truemped/couchbib.git
-   $ cd couchbib
+    $ git clone http://github.com/truemped/couchbib.git
+    $ cd couchbib
 
 Initialize the git submodules
 
-   $ git submodule init
-   $ git submodule update
+    $ git submodule init
+    $ git submodule update
 
 Create a *.couchapprc* for your needs. Example:
 
-   $ echo "{ \"env\" : \"default\" : { \"db\" : \"http://localhost:5984/couchbib\" } }" > .couchapprc
+    $ echo "{ \"env\" : \"default\" : { \"db\" : \"http://localhost:5984/couchbib\" } }" > .couchapprc
 
 Push the [couchapp][]
 
-   $ couchapp push
+    $ couchapp push
 
 Now visit: [your couchbib][yourcouchbib]
 
