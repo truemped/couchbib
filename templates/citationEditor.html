@@ -1,0 +1,43 @@
+<div id="citationeditor">
+    <h3 class="ui-widget-header ui-corner-all">Zitationsformate</h3>
+    <p>
+        <label for="typeselector">F&uuml;r Typ:&nbsp;</label>
+        <select id="typeselector">
+        {{#types}}
+            <option value="{{type}}">{{name}}</option>
+        {{/types}}
+        </select>
+    </p>
+    <p>
+        <label for="citationformat">Zitat:&nbsp;</label>
+        <input type="text" id="citationformat" size="90" />
+    </p>
+    <p>
+        <label for="citationformat">Bibliographie:&nbsp;</label>
+        <input type="text" id="bibliographyformat" size="90" />
+    </p>
+    <p id="citationbuttons">
+        <button id="savecitation">Speichern</button>
+    </p>
+</div>
+
+<div id="citationhelp">
+    <h3 class="ui-widget-header ui-corner-all">Hilfe</h3>
+
+    <div class="span-9">
+        <h4>Verf&uuml;gbare Felder</h4>
+        <p id="availableCitationFields" />
+    </div>
+
+    <div class="span-9 last">
+        <h4>Formatierungen</h4>
+        <p>
+        <dl>
+            <dt>&lt;b&gt;Text&lt;/b&gt;</dt>
+            <dd>Fett</dd>
+            <dt>&lt;i&gt;Text&lt;/i&gt;</dt>
+            <dd>Kursiv</dd>
+        </dl>
+        </p>
+    </div>
+</div>

@@ -4,6 +4,7 @@
     <li><a href="#tab_properties">Eigenschaften</a></li>
     {{#regular}}
     <li><a href="#tab_notes">Notizen</a></li>
+    <li><a href="#tab_citation">Zitierung</a></li>
     <li><a href="#tab_attachments">Anhänge</a></li>
     {{/regular}}
 </ul>
@@ -31,6 +32,32 @@
     <textarea name="note" id="nice_editor"></textarea><br/>
     <input type="submit" value="Speichern" />
 </div>
+
+<div id="tab_citation">
+
+    <h4 class="ui-widget-header ui-corner-all">Zitat</h4>
+    <p>{{{parsedquote}}}</p>
+    <h4 class="ui-widget-header ui-corner-all">Bibliographie</h4>
+    <p>{{{parsedbibliography}}}</p>
+
+    <h4 class="ui-widget-header ui-corner-all">Bibliographien Verwalten</h4>
+
+    <p style="text-align: center;">
+    <select id="bibliographySelector" name="bibliography" size="5" multiple>
+    {{%IMPLICIT-ITERATOR}}
+    {{#bibliography}}
+        <option>{{.}}</option>
+    {{/bibliography}}
+    </select>
+    <br/>
+    <button id="newBibliography">Neue Bibliographie</button>
+    <button id="delBibliography">L&ouml;schen</button><br/>
+    <input type="text" id="newBibliographyName" />
+    </p>
+
+    <input type="submit" value="Speichern" />
+</div>
+
 {{/regular}}
 
 </form>

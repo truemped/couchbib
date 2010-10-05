@@ -77,3 +77,24 @@ div.avatar img {
 #search_paging {
   text-align: center;
 }
+
+#citationbuttons {
+  text-align: right;
+}
+
+#tab_citation table td {
+  text-align: center;
+  vertical-align: top;
+}
+
+#tab_citation select {
+  width: 230px;
+}
+
+#tab_citation input {
+  width: 225px;
+}
+
+#tab_citation #bibliographyButtons {
+  vertical-align: middle;
+}
