@@ -101,9 +101,10 @@
          */
         this.bind( 'show-tag-cloud', function(e,data ) {
             $("#content").empty();
+            $("#content").append( "<p id=\"tagcloud\"></p>" );
             var self = this;
             self.withCouchApp( function( app ) {
-                self.appendAjaxResp( app.listPath("tag-cloud", "tagcloud")+"?group=true", "#content" );
+                self.appendAjaxResp( app.listPath("tag-cloud", "tagcloud")+"?group=true", "#tagcloud" );
             });
         });
 
