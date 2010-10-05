@@ -94,15 +94,12 @@
 
                         // add the quote
                         if( citationformats && citationformats.types[doc.type] ) {
-                            doc.quote = context.mustache( citationformats.types[doc.type], doc );
-                            doc.bibliography = context.mustache( citationformats.bibliography[doc.type], doc );
+                            doc.parsedquote = context.mustache( citationformats.types[doc.type], doc );
+                            doc.parsedbibliography = context.mustache( citationformats.bibliography[doc.type], doc );
                         } else {
                             doc.parsedquote = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
                             doc.parsedbibliography = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
                         }
-
-                        // add the available bibliographies
-                        doc.availableBibliographies = availableBibliographies;
 
                         // add all the attachments
                         doc.attachments = "";
@@ -119,21 +116,15 @@
                         $("#content").append( context.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
                         $("#itemDetails").tabs();
                         $("button, input:submit, input:file").button();
-                        $("#addToBibliography").button( {
-                            icons : {
-                                primary : "ui-icon-arrowthick-1-e"
-                            },
-                            text : false
-                        });
-                        $("#removeFromBibliography").button( {
-                            icons : {
-                                primary : "ui-icon-arrowthick-1-w"
-                            },
-                            text : false
-                        });
                         $("#newBibliography").button( {
                             icons : {
                                 primary : "ui-icon-arrowthick-1-n"
+                            },
+                            text : false
+                        });
+                        $("#delBibliography").button( {
+                            icons : {
+                                primary : "ui-icon-trash"
                             },
                             text : false
                         });
@@ -166,6 +157,39 @@
                                 }
                             },
                         });
+
+                        var addBibIfNotExists = function( newBibliographyName ) {
+                            var contains = false;
+                            $("#bibliographySelector option").each( function() {
+                                if( $(this).val() == newBibliographyName ) contains = true;
+                            });
+                            if(!contains) {
+                                $("#bibliographySelector").append( "<option>"+newBibliographyName+"</option>" );
+                            }
+                        }
+
+                        // add the newBibliography handling
+                        $("#newBibliography").bind( 'click', function() {
+                            addBibIfNotExists( $("#newBibliographyName").val() );
+                        });
+                        
+                        $("#delBibliography").bind( 'click', function() {
+                            $("#bibliographySelector option:selected").each( function() {
+                                $(this).remove();
+                            });
+                        });
+
+                        // show all availableBibliographies
+                        $.each( availableBibliographies, function(index, value) {
+                            addBibIfNotExists( value );
+                        });
+                        var sorted_options = $("#bibliographySelector option");
+                        sorted_options.sort( function(a,b) {
+                            if(a.text > b.text) return 1;
+                            else if(a.text < b.text) return -1;
+                            else return 0;
+                        });
+                        $("#bibliographySelector").empty().append( sorted_options );
 
                         // activate the delete button
                         $("#deleteDoc").bind( 'click', function() {
@@ -238,34 +262,6 @@
                         // add the nice editor for notes
                         $("#nice_editor").markItUp(myMarkdownSettings);
 
-                        var addBibIfNotExists = function( newBibliographyName ) {
-                            var contains = false;
-                            $("#activeBibliographies option").each( function() {
-                                if( $(this).val() == newBibliographyName ) contains = true;
-                            });
-                            if(!contains) {
-                                $("#activeBibliographies").append( "<option>"+newBibliographyName+"</option>" );
-                            }
-                        }
-
-                        // add the addToBibliography action
-                        $("#addToBibliography").bind( 'click', function() {
-                            $("#availableBibliographies option:selected").each( function() {
-                                addBibIfNotExists( $(this).val() );
-                            });
-                        });
-
-                        // add the removeFromBibliography handling
-                        $("#removeFromBibliography").bind( 'click', function() {
-                            $("#activeBibliographies option:selected").each( function() {
-                                $(this).remove();
-                            });
-                        });
-
-                        // add the newBibliography handling
-                        $("#newBibliography").bind( 'click', function() {
-                            addBibIfNotExists( $("#newBibliographyName").val() );
-                        });
                     }
 
                 });

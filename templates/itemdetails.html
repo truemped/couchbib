@@ -40,41 +40,22 @@
     <h4 class="ui-widget-header ui-corner-all">Bibliographie</h4>
     <p>{{{parsedbibliography}}}</p>
 
-    <h4 class="ui-widget-header ui-corner-all">Verwalten</h4>
-    <table width="100%" border="0">
-    <tr>
-        <td>
-            <h5>Verf&uuml;gbare Bibliographien</h5>
-            <select id="availableBibliographies" size="5" multiple>
-            {{%IMPLICIT-ITERATOR}}
-            {{#availableBibliographies}}
-                <option>{{.}}</option>
-            {{/availableBibliographies}}
-            </select>
-        </td>
-        <td id="bibliographyButtons">
-            <p>
-            <button id="addToBibliography">Hinzuf&uuml;gen</button><br/>
-            <button id="removeFromBibliography">L&ouml;schen</button><br/>
-            <br/>
-            <br/>
-            </p>
-        </td>
-        <td>
-            <h5>Aktive Bibliographien</h5>
-            <select id="activeBibliographies" name="bibliography" size="5" multiple>
-            {{#bibliography}}
-                <option>{{.}}</option>
-            {{/bibliography}}
-            </select>
-            <p style="text-align: center;">
-            <button id="newBibliography">Neue Bibliographie</button><br/>
-            <input type="text" id="newBibliographyName" />
-            </p>
-        </td>
-    </tr>
-    </table>
+    <h4 class="ui-widget-header ui-corner-all">Bibliographien Verwalten</h4>
 
+    <p style="text-align: center;">
+    <select id="bibliographySelector" name="bibliography" size="5" multiple>
+    {{%IMPLICIT-ITERATOR}}
+    {{#bibliography}}
+        <option>{{.}}</option>
+    {{/bibliography}}
+    </select>
+    <br/>
+    <button id="newBibliography">Neue Bibliographie</button>
+    <button id="delBibliography">L&ouml;schen</button><br/>
+    <input type="text" id="newBibliographyName" />
+    </p>
+
+    <input type="submit" value="Speichern" />
 </div>
 
 {{/regular}}
