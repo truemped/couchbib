@@ -1,0 +1,121 @@
+{
+    "article" : {
+        "name" : "Artikel",
+        "fields" : [
+            "author",
+            "title",
+            "journal",
+            "month",
+            "year",
+            "volume",
+            "number",
+            "pages",
+            "note"
+        ]
+    },
+    "book" : {
+        "name" : "Buch",
+        "fields" : [
+            "author",
+            "title",
+            "publisher",
+            "month",
+            "year",
+            "editor",
+            "volume",
+            "number",
+            "series",
+            "address",
+            "edition",
+            "note"
+        ]
+    },
+    "booklet" : {
+        "name" : "Booklet",
+        "fields" : [
+            "author",
+            "title",
+            "howpublished",
+            "month",
+            "year",
+            "address",
+            "note"
+        ]
+    },
+    "inbook" : {
+        "name" : "Buchkapitel",
+        "fields" : [
+            "author",
+            "title",
+            "publisher",
+            "editor",
+            "month",
+            "year",
+            "chapter",
+            "volume",
+            "number",
+            "series",
+            "edition",
+            "pages",
+            "address",
+            "note"
+        ]
+    },
+    "incollection" : {
+        "name" : "Beitrag im Sammelband",
+        "fields" : [
+            "author",
+            "title",
+            "booktitle",
+            "publisher",
+            "editor",
+            "month",
+            "year",
+            "chapter",
+            "volume",
+            "number",
+            "series",
+            "edition",
+            "pages",
+            "address",
+            "note"
+        ]
+    },
+    "masterthesis" : {
+        "name" : "Masterarbeit",
+        "fields" : [
+            "author",
+            "title",
+            "school",
+            "year",
+            "month",
+            "address",
+            "note"
+        ]
+    },
+    "phdthesis" : {
+        "name" : "Dissertation",
+        "fields" : [
+            "author",
+            "title",
+            "school",
+            "year",
+            "month",
+            "address",
+            "note"
+        ]
+    },
+    "proceedings" : {
+        "name" : "Sammelband",
+        "fields" : [
+            "title",
+            "year",
+            "editor",
+            "publisher",
+            "organization",
+            "address",
+            "month",
+            "note"
+        ]
+    }
+}

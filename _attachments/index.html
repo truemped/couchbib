@@ -7,24 +7,68 @@
     <link rel="stylesheet" href="style/main.css" type="text/css">
     <link rel="stylesheet" href="style/jquery-ui-1.8.1.custom.css" type="text/css">
 
-    <script src="/_utils/script/sha1.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/_utils/script/json2.js" type="text/javascript" charset="utf-8"></script>
-    <script src="vendor/jquery/loader.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/_utils/script/jquery.couch.js" type="text/javascript" charset="utf-8"></script>
-    <script src="vendor/sammy/loader.js" type="text/javascript" charset="utf-8"></script>
+    <!-- Framework CSS -->
+    <link rel="stylesheet" href="style/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="style/print.css" type="text/css" media="print" />
+    <!--[if IE]><link rel="stylesheet" href="style/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
-    <script src="scripts/app.js" type="text/javascript" charset="utf-8"></script>
-	
+    <!-- CSS Menu -->
+    <link href="style/dropdown/themes/default/helper.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="style/dropdown/dropdown.vertical.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="style/dropdown/themes/default/default.ultimate.css" media="screen" rel="stylesheet" type="text/css" />
+
+    <!-- markitup -->
+    <link href="style/markitup/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="style/markitup/markdown.style.css" media="screen" rel="stylesheet" type="text/css" />
+
 </head>
 
 <body>
-  <div id="container">
-    <div id="main">
+
+    <div class="container">
+
+        <hr class="space">&nbsp;</span>
+
+        <div class="span-24 last">
+            <h1><a href="#/">Bookshelf</a></h1>
+            <hr class="space">&nbsp;</span>
+        </div>
+
+        <div class="span-6">
+        <ul id="navigation" class="dropdown dropdown-vertical">
+            <li><a href="#/newest" rel="history">Neueste Eintr&auml;ge</a></li>
+            <li class="dir">
+                <img src="img/document-new.png" />&nbsp;Neuer Eintrag
+                <ul id="newDocTypeList"> </ul>
+            </li>
+            <li><a href="#/search" rel="history"><img src="img/system-search.png" />&nbsp;Suchen</a></li>
+            <li><a href="#/tagcloud" rel="history"><img src="img/weather-overcast.png" />&nbsp;Schlagw&ouml;rter</a></li>
+            <li><a href="#/citations" rel="histry">Zitationsformate</a></li>
+        </ul>
+        </div>
+
+        <div id="content" class="span-18 last">
+        </div>
+
+        <div id="dialog" style="display-style: none;">
+        </div>
+
     </div>
-    <ul id="link">
-      <li><a href="#/test">Click me!</a></li>
-      <li><a href="#/">Back</a></li>
-    </div>
-  </div>
+
+<script src="/_utils/script/sha1.js" type="text/javascript" charset="utf-8"></script>
+<script src="/_utils/script/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="vendor/jquery/loader.js" type="text/javascript" charset="utf-8"></script>
+<script src="/_utils/script/jquery.couch.js" type="text/javascript" charset="utf-8"></script>
+<script src="/_utils/script/jquery.form.js"></script>
+<script src="vendor/sammy/loader.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/jquery.markitup.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/markdown-set.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="scripts/app.helper.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/app.items.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/app.search.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/app.citations.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/app.js" type="text/javascript" charset="utf-8"></script>
+
 </body>
 </html>
