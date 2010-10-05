@@ -69,9 +69,18 @@
                 $("#newDocTypeList").append( context.mustache( template, { typedesc : typedesc } ) );
 
                 // and now some db maintenance:
-//                app.db.compact();
-//                app.db.viewCleanup();
-//                app.db.compactView();
+                app.db.compact( { error : function() {
+                        context.alertDialog( "Ups, bitte bei Daniel melden." );
+                    }
+                });
+                app.db.viewCleanup( { error : function() {
+                        context.alertDialog( "Ups, bitte bei Daniel melden." );
+                    }
+                } );
+                app.db.compactView("couchbib", {error : function() {
+                        context.alertDialog( "Ups, bitte bei Daniel melden." );
+                    }
+                });
             });
         });
 
