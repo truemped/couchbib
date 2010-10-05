@@ -72,9 +72,9 @@
 
         var editItem = function( couchapp, data, context ) {
 
-            var showEditor = function( citationformats ) {
+            var showEditor = function( citationformats, availableBibliographies ) {
                 couchapp.db.openDoc( data['docid'], {
-                    success : function(doc) {
+                    success : function( doc ) {
 
                         var type = couchapp.ddoc.types[ doc.type ];
                         doc.fields = [ { id : "citekey", name : couchapp.ddoc.fieldnames[ "citekey" ] } ];
@@ -82,6 +82,7 @@
                         var allFields = ["citekey"];
                         allFields = allFields.concat( type.fields );
                         allFields.push( "tags" );
+                        allFields.push( "bibliography" );
 
                         for( var idx in type.fields ) {
                             if( type.fields[idx].indexOf( "note" ) == -1 ) {
@@ -96,9 +97,12 @@
                             doc.quote = context.mustache( citationformats.types[doc.type], doc );
                             doc.bibliography = context.mustache( citationformats.bibliography[doc.type], doc );
                         } else {
-                            doc.quote = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
-                            doc.bibliography = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
+                            doc.parsedquote = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
+                            doc.parsedbibliography = context.mustache( "<b>{{author}}</b>, <i>{{title}}</i>, {{year}}", doc );
                         }
+
+                        // add the available bibliographies
+                        doc.availableBibliographies = availableBibliographies;
 
                         // add all the attachments
                         doc.attachments = "";
@@ -115,6 +119,24 @@
                         $("#content").append( context.mustache( couchapp.ddoc.templates.itemdetails, doc ) );
                         $("#itemDetails").tabs();
                         $("button, input:submit, input:file").button();
+                        $("#addToBibliography").button( {
+                            icons : {
+                                primary : "ui-icon-arrowthick-1-e"
+                            },
+                            text : false
+                        });
+                        $("#removeFromBibliography").button( {
+                            icons : {
+                                primary : "ui-icon-arrowthick-1-w"
+                            },
+                            text : false
+                        });
+                        $("#newBibliography").button( {
+                            icons : {
+                                primary : "ui-icon-arrowthick-1-n"
+                            },
+                            text : false
+                        });
 
                         // bind the form to the document
                         var postForm = couchapp.docForm( "form#item_details", {
@@ -216,18 +238,63 @@
                         // add the nice editor for notes
                         $("#nice_editor").markItUp(myMarkdownSettings);
 
+                        var addBibIfNotExists = function( newBibliographyName ) {
+                            var contains = false;
+                            $("#activeBibliographies option").each( function() {
+                                if( $(this).val() == newBibliographyName ) contains = true;
+                            });
+                            if(!contains) {
+                                $("#activeBibliographies").append( "<option>"+newBibliographyName+"</option>" );
+                            }
                         }
-                    });
-                }
 
-                couchapp.db.openDoc( "citationformats", {
-                success : function( doc ) {
-                    showEditor( doc );
+                        // add the addToBibliography action
+                        $("#addToBibliography").bind( 'click', function() {
+                            $("#availableBibliographies option:selected").each( function() {
+                                addBibIfNotExists( $(this).val() );
+                            });
+                        });
+
+                        // add the removeFromBibliography handling
+                        $("#removeFromBibliography").bind( 'click', function() {
+                            $("#activeBibliographies option:selected").each( function() {
+                                $(this).remove();
+                            });
+                        });
+
+                        // add the newBibliography handling
+                        $("#newBibliography").bind( 'click', function() {
+                            addBibIfNotExists( $("#newBibliographyName").val() );
+                        });
+                    }
+
+                });
+            }
+
+            var prepareEditor = function( citationformats ) {
+
+                // add all available bibliographies
+                couchapp.design.view( "bibliography", {
+                    group : true,
+                    success : function(resp) {
+                        var availableBibliographies = [];
+                        for( var row in resp.rows ) {
+                            availableBibliographies.push( resp.rows[ row ].key );
+                        }
+
+                        showEditor( citationformats, availableBibliographies );
+                    }
+                });
+
+            }
+
+            couchapp.db.openDoc( "citationformats", {
+                success : function( citationformats ) {
+                    prepareEditor( citationformats );
                 },
                 error : function() {
                 }
             });
-
 
         }
 

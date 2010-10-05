@@ -4,8 +4,8 @@
     <li><a href="#tab_properties">Eigenschaften</a></li>
     {{#regular}}
     <li><a href="#tab_notes">Notizen</a></li>
-    <li><a href="#tab_attachments">Anhänge</a></li>
     <li><a href="#tab_citation">Zitierung</a></li>
+    <li><a href="#tab_attachments">Anhänge</a></li>
     {{/regular}}
 </ul>
 
@@ -32,6 +32,51 @@
     <textarea name="note" id="nice_editor"></textarea><br/>
     <input type="submit" value="Speichern" />
 </div>
+
+<div id="tab_citation">
+
+    <h4 class="ui-widget-header ui-corner-all">Zitat</h4>
+    <p>{{{parsedquote}}}</p>
+    <h4 class="ui-widget-header ui-corner-all">Bibliographie</h4>
+    <p>{{{parsedbibliography}}}</p>
+
+    <h4 class="ui-widget-header ui-corner-all">Verwalten</h4>
+    <table width="100%" border="0">
+    <tr>
+        <td>
+            <h5>Verf&uuml;gbare Bibliographien</h5>
+            <select id="availableBibliographies" size="5" multiple>
+            {{%IMPLICIT-ITERATOR}}
+            {{#availableBibliographies}}
+                <option>{{.}}</option>
+            {{/availableBibliographies}}
+            </select>
+        </td>
+        <td id="bibliographyButtons">
+            <p>
+            <button id="addToBibliography">Hinzuf&uuml;gen</button><br/>
+            <button id="removeFromBibliography">L&ouml;schen</button><br/>
+            <br/>
+            <br/>
+            </p>
+        </td>
+        <td>
+            <h5>Aktive Bibliographien</h5>
+            <select id="activeBibliographies" name="bibliography" size="5" multiple>
+            {{#bibliography}}
+                <option>{{.}}</option>
+            {{/bibliography}}
+            </select>
+            <p style="text-align: center;">
+            <button id="newBibliography">Neue Bibliographie</button><br/>
+            <input type="text" id="newBibliographyName" />
+            </p>
+        </td>
+    </tr>
+    </table>
+
+</div>
+
 {{/regular}}
 
 </form>
@@ -53,15 +98,6 @@
         <input type="submit" value="Hinzufügen"/>
     </form>
     </p>
-</div>
-{{/regular}}
-
-{{#regular}}
-<div id="tab_citation">
-    <h4>Zitat</h4>
-    <p>{{{quote}}}</p>
-    <h4>Bibliographie</h4>
-    <p>{{{bibliography}}}</p>
 </div>
 {{/regular}}
 
