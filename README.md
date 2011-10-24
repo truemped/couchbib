@@ -1,4 +1,3 @@
-
 Couch Bib
 ===
 
@@ -46,7 +45,7 @@ Initialize the git submodules
 
 Create a *.couchapprc* for your needs. Example:
 
-    $ echo "{ \"env\" : \"default\" : { \"db\" : \"http://localhost:5984/couchbib\" } }" > .couchapprc
+    $ echo "{ \"env\" : { \"default\" : { \"db\" : \"http://localhost:5984/couchbib\" } } }" > .couchapprc
 
 Push the [couchapp][]
 
